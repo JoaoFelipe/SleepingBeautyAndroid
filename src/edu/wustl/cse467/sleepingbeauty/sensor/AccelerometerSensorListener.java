@@ -23,16 +23,9 @@
  */
 package edu.wustl.cse467.sleepingbeauty.sensor;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import edu.wustl.cse467.sleepingbeauty.graph.CustomGraphView;
-import edu.wustl.cse467.sleepingbeauty.http.PostRequestAsync;
 
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -41,23 +34,16 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class AccelerometerSensorListener implements SensorEventListener, Runnable {
-
-	public static String URL = "http://sleepingbeauty.herokuapp.com/accel_datas";
-	public static int TIME = 20;
-	public static TimeUnit TIME_UNIT = TimeUnit.SECONDS;
+public class AccelerometerSensorListener implements SensorEventListener {
 
 	private CustomGraphView graphView;
 	private TextView accelerationText;
 	private CheckBox autoScrollCheck;
-	private ImageView imageView;
-	
+
 	private long firstTime;
 	
 	private float[] previousValues;
 	private long previousTime;
-	
-	private List<TimeValues> accelValues;
 	
 	/*
 	 * Constructor
@@ -70,17 +56,11 @@ public class AccelerometerSensorListener implements SensorEventListener, Runnabl
 		this.graphView = graphView;
 		this.accelerationText = accelerationText;
 		this.autoScrollCheck = autoScrollCheck;
-		this.imageView = imageView;
 		
 		firstTime = new Date().getTime();
 		previousValues = new float[] {
 				0, 0, 0
 		};
-		
-		ScheduledExecutorService scheduleTaskExecutor = Executors.newScheduledThreadPool(5);
-		scheduleTaskExecutor.scheduleAtFixedRate(this, 0, TIME, TIME_UNIT);
-		
-		accelValues = new ArrayList<TimeValues>();
 		
 	}
 	/*
@@ -99,8 +79,6 @@ public class AccelerometerSensorListener implements SensorEventListener, Runnabl
 	@Override
 	public void onSensorChanged(SensorEvent event) {
 		long timestamp = new Date().getTime();
-		
-		accelValues.add(new TimeValues(event.values, timestamp));
 		
 		long currentTime = timestamp - firstTime;
 		graphView.appendAccelerometerData(currentTime, event.values, autoScrollCheck.isChecked());
@@ -134,20 +112,5 @@ public class AccelerometerSensorListener implements SensorEventListener, Runnabl
 		
 	}
 	
-	/*
-	 * run
-	 * This method executes each TIME TIME_UNIT
-	 * It posts the acquired data to the URL
-	 */
-	@Override
-	public void run() {
-		HashMap<String, String> data = new HashMap<String, String>();
-		for (int i = 0; i < accelValues.size(); i++) {
-			accelValues.get(i).addToPostData("accel_data", data, i);
-		}
-		accelValues.clear();
-		PostRequestAsync post = new PostRequestAsync(data, imageView);
-		post.execute(URL);	
-	}
 
 }

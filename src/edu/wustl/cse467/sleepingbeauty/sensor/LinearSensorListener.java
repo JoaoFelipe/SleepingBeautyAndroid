@@ -17,6 +17,9 @@
  * 	This class represents the linear acceleration sensor.
  * 	It gets the linear acceleration data,  calculate the derived data and append to the graph
  * 	If it recognizes an impact, it sends to the website
+ * Version log:
+ *    3/27/2013, Joao Felipe
+ *    	Sending linear acceleration data to website when detect impact
  */
 package edu.wustl.cse467.sleepingbeauty.sensor;
 
@@ -57,6 +60,7 @@ public class LinearSensorListener implements SensorEventListener, Runnable {
 	private long previousTime;
 	
 	private List<RoughValues> roughValues;
+	private boolean lastRough;
 	
 	/*
 	 * Constructor
@@ -80,6 +84,7 @@ public class LinearSensorListener implements SensorEventListener, Runnable {
 		scheduleTaskExecutor.scheduleAtFixedRate(this, 0, TIME, TIME_UNIT);
 		
 		roughValues = new ArrayList<RoughValues>();
+		lastRough = false;
 	}
 	/*
 	 * This method is called when the accuracy of the sensor changes
@@ -113,10 +118,19 @@ public class LinearSensorListener implements SensorEventListener, Runnable {
 		} 
 		
 		if (Math.abs(newValues[0]) >= MINIMAL_IMPACT || Math.abs(newValues[1]) >= MINIMAL_IMPACT || Math.abs(newValues[2]) >= MINIMAL_IMPACT) {
+			if (!lastRough) {
+				roughValues.add(new RoughValues(false, timestamp, previousValues));
+				lastRough = true;
+			}
 			boolean roughy = (Math.abs(newValues[0]) >= STRONG_IMPACT || Math.abs(newValues[1]) >= STRONG_IMPACT || Math.abs(newValues[2]) >= STRONG_IMPACT);
-			roughValues.add(new RoughValues(roughy, timestamp));
+			roughValues.add(new RoughValues(roughy, timestamp, event.values));
 			if (roughy) {
 				this.run();
+			}
+		} else {
+			if (lastRough) {
+				roughValues.add(new RoughValues(false, timestamp, event.values));
+				lastRough = false;
 			}
 		}
 		
@@ -144,13 +158,15 @@ public class LinearSensorListener implements SensorEventListener, Runnable {
 	 */
 	@Override
 	public void run() {
-		HashMap<String, String> data = new HashMap<String, String>();
-		for (int i = 0; i < roughValues.size(); i++) {
-			roughValues.get(i).addToPostData("rough_mov", data, i);
+		if (roughValues.size() > 0) {
+			HashMap<String, String> data = new HashMap<String, String>();
+			for (int i = 0; i < roughValues.size(); i++) {
+				roughValues.get(i).addToPostData("rough_movs", data, i);
+			}
+			roughValues.clear();
+			PostRequestAsync post = new PostRequestAsync(data, imageView);
+			post.execute(URL);	
 		}
-		roughValues.clear();
-		PostRequestAsync post = new PostRequestAsync(data, imageView);
-		post.execute(URL);	
 	}
 
 }

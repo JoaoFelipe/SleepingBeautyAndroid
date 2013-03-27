@@ -57,7 +57,8 @@ public class PostRequestAsync extends AsyncTask<String, String, String> {
 			imageView.setImageResource(R.drawable.green);
 		} else {
 			imageView.setImageResource(R.drawable.red);
-			System.out.println("stat"+postRequest.status);
+			System.out.println("stat "+postRequest.status);
+			System.out.println(r);
 		}
 	}
 

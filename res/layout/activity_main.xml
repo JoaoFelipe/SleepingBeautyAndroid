@@ -106,6 +106,6 @@ Version log:
        android:layout_height="wrap_content"
        android:layout_alignLeft="@+id/zoom"
        android:layout_alignParentTop="true"
-       android:text="Lights" />
+       android:text="@string/lights" />
 
 </RelativeLayout>

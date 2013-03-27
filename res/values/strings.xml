@@ -36,4 +36,6 @@ Version log:
    <string name="linear_title">Linear Acceleration Graph</string>
    <string name="menu_derived_linear">Derived Linear</string>
    <string name="derived_linear_title">Derived Linear Graph</string>
+   <string name="action_exit">Exit</string>
+   <string name="lights">Lights</string>
 </resources>

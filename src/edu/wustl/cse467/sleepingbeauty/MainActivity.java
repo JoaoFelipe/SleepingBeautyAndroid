@@ -49,6 +49,7 @@ import android.widget.TextView;
 import android.widget.ToggleButton;
 import android.widget.ZoomControls;
 import android.app.Activity;
+import android.content.Intent;
 
 public class MainActivity extends Activity {
 
@@ -130,6 +131,12 @@ public class MainActivity extends Activity {
 	      	graphView.useDerivedLinear(); 
 	      	graphTitle.setText(getString(R.string.derived_linear_title));
 	      	return true;
+	      case R.id.action_exit:
+	      	Intent intent = new Intent(Intent.ACTION_MAIN);
+	      	intent.addCategory(Intent.CATEGORY_HOME);
+	      	intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+	      	moveTaskToBack(true);
+	      	startActivity(intent);
 	      default:
 	         return super.onOptionsItemSelected(item);
 	    }

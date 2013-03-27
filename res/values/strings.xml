@@ -18,9 +18,22 @@ Version log:
 <resources>
 
    <string name="app_name">SleepingBeauty</string>
-   <string name="action_settings">Settings</string>
+   <string name="action_settings">Change Graph</string>
    <string name="xyz">X:\nY:\nZ:</string>
    <string name="graph_title">Accelerometer Graph</string>
    <string name="auto_scroll">Auto Scroll</string>
-
+   <string name="internet_not_working">Internet not working</string>
+   <string name="internet_working">Internet working</string>
+   <string name="internet">Internet</string>
+   <string name="derived">Derived</string>
+   <string name="accelerometer">Accelerometer</string>
+   <string name="linear_acceleration">Linear Accel</string>
+   <string name="menu_accelerometer">Accelerometer</string>
+   <string name="menu_derived">Derived</string>
+   <string name="menu_linear">Linear Acceleration</string>
+   <string name="accelerometer_title">Accelerometer Graph</string>
+   <string name="derived_title">Derived Graph</string>
+   <string name="linear_title">Linear Acceleration Graph</string>
+   <string name="menu_derived_linear">Derived Linear</string>
+   <string name="derived_linear_title">Derived Linear Graph</string>
 </resources>

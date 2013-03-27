@@ -2,53 +2,60 @@
  * Purpose: Midterm Demo
  * Author : Joao Felipe
  * 		   joaofelipenp@gmail.com
- * 			Tiago Pimentel
- * 		   t.pimentelms@gmail.com
  * CSE 467S - Embedded Computing Systems
  * WUSTL, Spring 2013
  * Date   : Mar., 23, 2013
  * 
- * Invariants:
- * 	URL should a valid URL
  * Description:
  * 	This is the program application. 
- * 	It instantiates the sensor, the graph and the zoom and obtains the values from the sensor.
- * 	For each obtained value, it updates the graph and sends a post request to the URL
+ * 	It instantiates the sensors, the graph and the interface
  * Version log:
- * 	3/24/2013, Joao Felipe
+ * 	3/24/2013 v1, Joao Felipe
  * 		Refactoring to separate the Graph and Zoom functionalities from this file
+ *       Refactoring to separate Accelerometer sensor from this file
+ *    3/24/2013 v2, Joao Felipe and Tiago Pimentel (t.pimentelms@gmail.com)
+ *    	Adding zoom buttons
+ *       Adding Image for internet check
+ *       Adding Linear Acceleration sensor
+ *       Adding derived information
+ *    3/24/2013 v3, Joao Felipe
+ *       Adding menu for different graphs
+ *    	Refactoring to separate zoom functionality from this file
+ *    3/25/2013, Joao Felipe and Tiago Pimentel
+ *    	Adding button to turn the lights on and off
+ *    3/26/2013, Joao Felipe
+ *    	Refactoring to separate the light button from this file
  */
 
 package edu.wustl.cse467.sleepingbeauty;
 
-import java.util.Date;
-import java.util.HashMap;
 
+import edu.wustl.cse467.sleepingbeauty.graph.CustomGraphView;
+import edu.wustl.cse467.sleepingbeauty.gui.GraphZoomControls;
+import edu.wustl.cse467.sleepingbeauty.gui.LightButtonClickListener;
+import edu.wustl.cse467.sleepingbeauty.gui.LightStatus;
+import edu.wustl.cse467.sleepingbeauty.sensor.AccelerometerSensorListener;
+import edu.wustl.cse467.sleepingbeauty.sensor.LinearSensorListener;
 import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.WindowManager;
 import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 import android.widget.ZoomControls;
 import android.app.Activity;
 
-public class MainActivity extends Activity implements SensorEventListener {
+public class MainActivity extends Activity {
 
 	public static String URL = "http://sleepingbeauty.heroku.com";
-	
-	private Sensor accelerometer;
-	private SensorManager sensorManager;
-	private AccelerometerGraph graphView;
-	
-	private TextView accelerationText;
-	private CheckBox autoScrollCheck;
-	private LinearLayout layout;
-	
-	long firstTime;
+
+	CustomGraphView graphView;
+	TextView graphTitle;
 	
 	/*
 	 * This method is called after starting the application. 
@@ -58,56 +65,74 @@ public class MainActivity extends Activity implements SensorEventListener {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		
+		System.out.println("Start here");
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		
-		sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-		accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-		sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
-		System.out.println("Entrei");
-		graphView = new AccelerometerGraph(this);
-		new AccelerometerGraphZoomControls(graphView, (ZoomControls) findViewById(R.id.zoom));
+		CheckBox autoScrollCheck = (CheckBox) findViewById(R.id.autoscroll);
+		TextView accelerationText = (TextView) findViewById(R.id.acceleration);
+		ImageView imageView = (ImageView) findViewById(R.id.wifistatus);
 		
-		autoScrollCheck = (CheckBox) findViewById(R.id.autoscroll);
-		accelerationText = (TextView) findViewById(R.id.acceleration);
+		ToggleButton lightsButton = (ToggleButton) findViewById(R.id.lightsButton);
+		lightsButton.setOnClickListener(new LightButtonClickListener(imageView, lightsButton));
 		
-		layout = (LinearLayout) findViewById(R.id.linear);  
+		graphView = new CustomGraphView(this);
+		new GraphZoomControls(graphView, (ZoomControls) findViewById(R.id.zoom));
+		
+		graphTitle = (TextView) findViewById(R.id.graphtitle);
+		
+		SensorManager sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+		sensorManager.registerListener(
+				new AccelerometerSensorListener(graphView, accelerationText, autoScrollCheck, imageView), 
+				sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), 
+				SensorManager.SENSOR_DELAY_NORMAL);
+		sensorManager.registerListener(
+				new LinearSensorListener(graphView, accelerationText, autoScrollCheck, imageView), 
+				sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION), 
+				SensorManager.SENSOR_DELAY_NORMAL);
+		
+		LinearLayout layout = (LinearLayout) findViewById(R.id.linear);  
 		layout.addView(graphView);  
 		
-		firstTime = new Date().getTime();
+		new LightStatus(imageView, lightsButton);
+	}
+
+	/*
+	 * onCreateOptionsMenu
+	 * Show the menu to select graph when clicked on menu button
+	 */
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.main, menu);
+		return true;
 	}
 	
 	/*
-	 * This method is called when the accuracy of the sensor changes
+	 * onOptionsItemSelected
+	 * Set the graph according to selectted item
 	 */
 	@Override
-	public void onAccuracyChanged(Sensor sensor, int accuracy) {
+	public boolean onOptionsItemSelected(MenuItem item) {
+	   // Handle item selection
+	   switch (item.getItemId()) {
+	      case R.id.item1:
+	      	graphView.useAccelerometer();
+	      	graphTitle.setText(getString(R.string.accelerometer_title));
+	         return true;
+	      case R.id.item2:
+	      	graphView.useDerived();
+	      	graphTitle.setText(getString(R.string.derived_title));
+            return true;
+	      case R.id.item3:
+	      	graphView.useLinear(); 
+	      	graphTitle.setText(getString(R.string.linear_title));
+	      	return true;
+	      case R.id.item4:
+	      	graphView.useDerivedLinear(); 
+	      	graphTitle.setText(getString(R.string.derived_linear_title));
+	      	return true;
+	      default:
+	         return super.onOptionsItemSelected(item);
+	    }
 	}
-
-	/*
-	 * This method is called when it receives a value from the sensor
-	 * The param event has the attribute values that represents the values of the sensors
-	 * When it is called, it updates the graph, the label and post the data to the URL
-	 */
-	@Override
-	public void onSensorChanged(SensorEvent event) {
-		long timestamp = new Date().getTime();
-		
-		HashMap<String, String> data = new HashMap<String, String>();
-		data.put("accel_data[x]", event.values[0]+"");
-		data.put("accel_data[y]", event.values[1]+"");
-		data.put("accel_data[z]", event.values[2]+"");
-		data.put("accel_data[measure_time]", timestamp+"");
-		
-		long currentTime = timestamp - firstTime;
-		graphView.appendData(currentTime, event.values, autoScrollCheck.isChecked());
-		
-		accelerationText.setText("X: " + event.values[0]+
-				"\nY: " + event.values[1]+
-				"\nZ: " + event.values[2]);
-		
-		PostRequestAsync post = new PostRequestAsync(data);
-		post.execute(URL);	
-	}
-
+	
 }

@@ -1,5 +1,5 @@
 /*		AccelerometerSensorListener.java
- * Purpose: Midterm Demo
+ * Purpose: Midterm Demo/Changed for Final Demo
  * Author : Joao Felipe
  * 		  joaofelipenp@gmail.com
  * 			Tiago Pimentel
@@ -20,6 +20,8 @@
  * Version log:
  *    3/27/2013, Joao Felipe
  *    	Sending linear acceleration data to website when detect impact
+ *    4/21/2013, Joao Felipe
+ *			Using URL from MainActivity, allowing the URL configuration
  */
 package edu.wustl.cse467.sleepingbeauty.sensor;
 
@@ -31,6 +33,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import edu.wustl.cse467.sleepingbeauty.MainActivity;
 import edu.wustl.cse467.sleepingbeauty.graph.CustomGraphView;
 import edu.wustl.cse467.sleepingbeauty.http.PostRequestAsync;
 
@@ -43,7 +46,7 @@ import android.widget.TextView;
 
 public class LinearSensorListener implements SensorEventListener, Runnable {
 
-	public static String URL = "http://sleepingbeauty.herokuapp.com/rough_movements";
+	public static String URL_PATH = "/rough_movements";
 	public static int TIME = 20;
 	public static TimeUnit TIME_UNIT = TimeUnit.SECONDS;
 	public static double MINIMAL_IMPACT = 0.00025;
@@ -165,7 +168,7 @@ public class LinearSensorListener implements SensorEventListener, Runnable {
 			}
 			roughValues.clear();
 			PostRequestAsync post = new PostRequestAsync(data, imageView);
-			post.execute(URL);	
+			post.execute(MainActivity.URL + URL_PATH);	
 		}
 	}
 

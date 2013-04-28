@@ -38,6 +38,7 @@ import edu.wustl.cse467.sleepingbeauty.sensor.AccelerometerSensorListener;
 import edu.wustl.cse467.sleepingbeauty.sensor.LinearSensorListener;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
+import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -49,6 +50,7 @@ import android.widget.TextView;
 import android.widget.ToggleButton;
 import android.widget.ZoomControls;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 
 public class MainActivity extends Activity {
@@ -95,6 +97,8 @@ public class MainActivity extends Activity {
 		layout.addView(graphView);  
 		
 		new LightStatus(imageView, lightsButton);
+		UsbManager manager = (UsbManager) getSystemService(Context.USB_SERVICE);
+		UsbAccessory[] accessoryList = manager.getAccessoryList();
 	}
 
 	/*
@@ -130,6 +134,10 @@ public class MainActivity extends Activity {
 	      case R.id.item4:
 	      	graphView.useDerivedLinear(); 
 	      	graphTitle.setText(getString(R.string.derived_linear_title));
+	      	return true;
+	      case R.id.action_config:
+	      	Intent configIntent = new Intent(MainActivity.this, ConfigActivity.class);
+	      	startActivityForResult(configIntent, 0);
 	      	return true;
 	      case R.id.action_exit:
 	      	Intent intent = new Intent(Intent.ACTION_MAIN);

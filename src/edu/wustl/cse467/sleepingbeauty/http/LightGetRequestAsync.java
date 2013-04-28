@@ -1,5 +1,5 @@
 /*		LightGetRequestAsync.java
- * Purpose: Midterm Demo
+ * Purpose: Midterm Demo/Changed for Final Demo
  * Author : Joao Felipe
  * 		  joaofelipenp@gmail.com
  * CSE 467S - Embedded Computing Systems
@@ -8,6 +8,9 @@
  * 
  * Description:
  * 	This class realizes an asynchronous get to the light URL to check its status
+  * Version Log:
+ *		4/21/2013, Joao Felipe
+ *			Using URL from MainActivity, allowing the URL configuration
  */
 
 package edu.wustl.cse467.sleepingbeauty.http;
@@ -15,6 +18,7 @@ package edu.wustl.cse467.sleepingbeauty.http;
 
 import java.util.HashMap;
 
+import edu.wustl.cse467.sleepingbeauty.MainActivity;
 import edu.wustl.cse467.sleepingbeauty.R;
 import edu.wustl.cse467.sleepingbeauty.gui.LightStatus;
 
@@ -24,7 +28,7 @@ import android.widget.ToggleButton;
 
 public class LightGetRequestAsync extends AsyncTask<String, String, String> {
 
-	public static String URL = "http://sleepingbeauty.herokuapp.com/light_power/last.txt";
+	public static String URL_PATH = "/light_power/last.txt";
 	
 	private GetRequest getRequest;
 	private ImageView imageView;
@@ -49,7 +53,7 @@ public class LightGetRequestAsync extends AsyncTask<String, String, String> {
 	 */
 	@Override
 	protected String doInBackground(String... params) {
-		return getRequest.execute(URL);
+		return getRequest.execute(MainActivity.URL + URL_PATH);
 	}
 	
 	@Override

@@ -27,19 +27,21 @@ public final class R {
     }
     public static final class id {
         public static final int acceleration=0x7f080001;
-        public static final int action_exit=0x7f08000e;
-        public static final int action_settings=0x7f080009;
+        public static final int action_exit=0x7f080010;
+        public static final int action_settings=0x7f08000b;
         public static final int autoscroll=0x7f080005;
-        public static final int graphtitle=0x7f080002;
-        public static final int internetStatus=0x7f080007;
-        public static final int item1=0x7f08000a;
-        public static final int item2=0x7f08000b;
-        public static final int item3=0x7f08000c;
-        public static final int item4=0x7f08000d;
+        public static final int bluetoothStatus=0x7f080007;
+        public static final int bluetoothstatustext=0x7f080006;
+        public static final int graphtitle=0x7f080003;
+        public static final int internetStatus=0x7f080009;
+        public static final int item1=0x7f08000c;
+        public static final int item2=0x7f08000d;
+        public static final int item3=0x7f08000e;
+        public static final int item4=0x7f08000f;
         public static final int layout=0x7f080000;
         public static final int lightsButton=0x7f080008;
-        public static final int linear=0x7f080003;
-        public static final int wifistatus=0x7f080006;
+        public static final int linear=0x7f080002;
+        public static final int wifistatus=0x7f08000a;
         public static final int zoom=0x7f080004;
     }
     public static final class layout {
@@ -55,6 +57,7 @@ public final class R {
         public static final int action_settings=0x7f050001;
         public static final int app_name=0x7f050000;
         public static final int auto_scroll=0x7f050004;
+        public static final int bluetooth=0x7f050015;
         public static final int derived=0x7f050008;
         public static final int derived_linear_title=0x7f050012;
         public static final int derived_title=0x7f05000f;

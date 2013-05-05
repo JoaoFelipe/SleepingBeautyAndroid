@@ -1,5 +1,5 @@
 /*		MainActivity.java
- * Purpose: Midterm Demo
+ * Purpose: Midterm Demo/Final Demo
  * Author : Joao Felipe
  * 		   joaofelipenp@gmail.com
  * CSE 467S - Embedded Computing Systems
@@ -25,14 +25,20 @@
  *    	Adding button to turn the lights on and off
  *    3/26/2013, Joao Felipe
  *    	Refactoring to separate the light button from this file
+ *	  4/29/2013, Joao Felipe
+ *    	Adding bluetooth functionality
+  *	  4/30/2013, Joao Felipe
+ *    	Refactoring LightInformation to possibility change from web and from bluetooth
  */
 
 package edu.wustl.cse467.sleepingbeauty;
 
 
+import edu.wustl.cse467.sleepingbeauty.bluetooth.BluetoothApi;
 import edu.wustl.cse467.sleepingbeauty.graph.CustomGraphView;
 import edu.wustl.cse467.sleepingbeauty.gui.GraphZoomControls;
 import edu.wustl.cse467.sleepingbeauty.gui.LightButtonClickListener;
+import edu.wustl.cse467.sleepingbeauty.gui.LightInformation;
 import edu.wustl.cse467.sleepingbeauty.gui.LightStatus;
 import edu.wustl.cse467.sleepingbeauty.sensor.AccelerometerSensorListener;
 import edu.wustl.cse467.sleepingbeauty.sensor.LinearSensorListener;
@@ -57,6 +63,7 @@ public class MainActivity extends Activity {
 
 	CustomGraphView graphView;
 	TextView graphTitle;
+	BluetoothApi bluetooth;
 	
 	/*
 	 * This method is called after starting the application. 
@@ -72,9 +79,17 @@ public class MainActivity extends Activity {
 		CheckBox autoScrollCheck = (CheckBox) findViewById(R.id.autoscroll);
 		TextView accelerationText = (TextView) findViewById(R.id.acceleration);
 		ImageView imageView = (ImageView) findViewById(R.id.wifistatus);
+		ImageView bluetoothStatus = (ImageView) findViewById(R.id.bluetoothStatus);
+	
 		
 		ToggleButton lightsButton = (ToggleButton) findViewById(R.id.lightsButton);
-		lightsButton.setOnClickListener(new LightButtonClickListener(imageView, lightsButton));
+		LightInformation lightInformation = new LightInformation(lightsButton);
+		
+		bluetooth = new BluetoothApi(bluetoothStatus, lightInformation);
+		bluetooth.connect();
+		
+		lightsButton.setOnClickListener(new LightButtonClickListener(imageView, lightInformation, bluetooth));
+		
 		
 		graphView = new CustomGraphView(this);
 		new GraphZoomControls(graphView, (ZoomControls) findViewById(R.id.zoom));
@@ -87,16 +102,44 @@ public class MainActivity extends Activity {
 				sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), 
 				SensorManager.SENSOR_DELAY_NORMAL);
 		sensorManager.registerListener(
-				new LinearSensorListener(graphView, accelerationText, autoScrollCheck, imageView), 
+				new LinearSensorListener(graphView, accelerationText, autoScrollCheck, imageView, bluetooth), 
 				sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION), 
 				SensorManager.SENSOR_DELAY_NORMAL);
 		
 		LinearLayout layout = (LinearLayout) findViewById(R.id.linear);  
 		layout.addView(graphView);  
 		
-		new LightStatus(imageView, lightsButton);
+		new LightStatus(imageView, lightInformation, bluetooth);
 	}
-
+	
+	/*
+	 * This method is called on activity start
+	 */
+	@Override
+	protected void onStart() {
+		super.onStart();
+		bluetooth.onStart();
+	}
+	
+	/*
+	 * This method is called on activity resume
+	 */
+	@Override
+	protected void onResume() {
+		super.onResume();
+		bluetooth.onResume();
+	}
+	
+	/*
+	 * This method is called on activity destroy
+	 */
+	@Override
+	protected void onDestroy() {
+		bluetooth.onDestroy();
+		super.onDestroy();
+	}
+	
+	
 	/*
 	 * onCreateOptionsMenu
 	 * Show the menu to select graph when clicked on menu button

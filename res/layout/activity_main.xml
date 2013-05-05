@@ -36,18 +36,7 @@ Version log:
       android:layout_alignParentLeft="true"
       android:layout_alignParentTop="true"
       android:text="@string/xyz"
-      android:textAppearance="?android:attr/textAppearanceLarge" />
-
-   <TextView
-      android:id="@+id/graphtitle"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_centerHorizontal="true"
-      android:layout_below="@+id/acceleration"
-      android:text="@string/graph_title"
-      android:textAppearance="?android:attr/textAppearanceLarge"
-      android:layout_marginTop="10dp"
-      android:textColor="#FFFFFFFF" />
+      android:textAppearance="?android:attr/textAppearanceMedium" />
    
    <LinearLayout
       android:id="@+id/linear"
@@ -78,34 +67,63 @@ Version log:
       android:textAppearance="?android:attr/textAppearanceMedium"
       android:textColor="#FFFFFFFF" />
 
-   <ImageView
-       android:id="@+id/wifistatus"
-       android:contentDescription="@string/internet_not_working"
+   <TextView
+       android:id="@+id/graphtitle"
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
-       android:layout_alignRight="@+id/zoom"
-       android:layout_alignTop="@+id/acceleration"
+       android:layout_below="@+id/bluetoothstatustext"
+       android:layout_centerHorizontal="true"
+       android:text="@string/graph_title"
+       android:textAppearance="?android:attr/textAppearanceLarge"
+       android:textColor="#FFFFFFFF" />
+
+   <TextView
+       android:id="@+id/bluetoothstatustext"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_alignLeft="@+id/acceleration"
+       android:layout_below="@+id/acceleration"
+       android:layout_marginTop="6dp"
+       android:text="@string/bluetooth"
+       android:textAppearance="?android:attr/textAppearanceMedium"
+       android:textColor="#FFFFFFFF" />
+
+   <ImageView
+       android:id="@+id/bluetoothStatus"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_below="@+id/lightsButton"
        android:layout_marginTop="15dp"
-       android:layout_marginRight="15dp"
+       android:layout_toRightOf="@+id/bluetoothstatustext"
+       android:contentDescription="@string/internet_not_working"
        android:src="@drawable/red" />
 
    <TextView
        android:id="@+id/internetStatus"
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
-       android:layout_alignBaseline="@+id/acceleration"
-       android:layout_alignBottom="@+id/acceleration"
-       android:layout_alignParentRight="true"
+       android:layout_alignBaseline="@+id/bluetoothstatustext"
+       android:layout_alignBottom="@+id/bluetoothstatustext"
+       android:layout_toRightOf="@+id/bluetoothStatus"
        android:text="@string/internet"
-       android:textAppearance="?android:attr/textAppearanceLarge"
+       android:textAppearance="?android:attr/textAppearanceMedium"
        android:textColor="#FFFFFFFF" />
+
+   <ImageView
+       android:id="@+id/wifistatus"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_alignTop="@+id/bluetoothStatus"
+       android:layout_toRightOf="@+id/internetStatus"
+       android:contentDescription="@string/internet_not_working"
+       android:src="@drawable/red" />
 
    <ToggleButton
        android:id="@+id/lightsButton"
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
-       android:layout_alignLeft="@+id/zoom"
-       android:layout_alignParentTop="true"
+       android:layout_alignRight="@+id/zoom"
+       android:layout_alignTop="@+id/acceleration"
        android:text="@string/lights" />
 
 </RelativeLayout>

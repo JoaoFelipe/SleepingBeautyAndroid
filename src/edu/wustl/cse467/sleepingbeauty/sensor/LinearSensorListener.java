@@ -1,5 +1,5 @@
 /*		AccelerometerSensorListener.java
- * Purpose: Midterm Demo
+ * Purpose: Midterm Demo/Final Demo
  * Author : Joao Felipe
  * 		  joaofelipenp@gmail.com
  * 			Tiago Pimentel
@@ -20,6 +20,11 @@
  * Version log:
  *    3/27/2013, Joao Felipe
  *    	Sending linear acceleration data to website when detect impact
+ *	  4/29/2013, Joao Felipe
+ *    	Sending rough movement information via bluetooth
+ *	  4/30/2013, Joao Felipe
+ *    	Trying to solve bluetooth interference on accelerometer by ignoring sensor if there are 
+ *      less than 3 rough movements in 5 seconds
  */
 package edu.wustl.cse467.sleepingbeauty.sensor;
 
@@ -31,6 +36,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import edu.wustl.cse467.sleepingbeauty.bluetooth.BluetoothApi;
 import edu.wustl.cse467.sleepingbeauty.graph.CustomGraphView;
 import edu.wustl.cse467.sleepingbeauty.http.PostRequestAsync;
 
@@ -61,6 +67,8 @@ public class LinearSensorListener implements SensorEventListener, Runnable {
 	
 	private List<RoughValues> roughValues;
 	private boolean lastRough;
+	private BluetoothApi bluetooth;
+	
 	
 	/*
 	 * Constructor
@@ -69,7 +77,8 @@ public class LinearSensorListener implements SensorEventListener, Runnable {
 	public LinearSensorListener(
 			CustomGraphView graphView, 
 			TextView accelerationText, CheckBox autoScrollCheck,
-			ImageView imageView) {
+			ImageView imageView, BluetoothApi bluetooth) {
+		this.bluetooth = bluetooth;
 		this.graphView = graphView;
 		this.accelerationText = accelerationText;
 		this.autoScrollCheck = autoScrollCheck;
@@ -82,7 +91,7 @@ public class LinearSensorListener implements SensorEventListener, Runnable {
 		
 		ScheduledExecutorService scheduleTaskExecutor = Executors.newScheduledThreadPool(5);
 		scheduleTaskExecutor.scheduleAtFixedRate(this, 0, TIME, TIME_UNIT);
-		
+			
 		roughValues = new ArrayList<RoughValues>();
 		lastRough = false;
 	}
@@ -121,10 +130,12 @@ public class LinearSensorListener implements SensorEventListener, Runnable {
 			if (!lastRough) {
 				roughValues.add(new RoughValues(false, timestamp, previousValues));
 				lastRough = true;
-			}
+			} 
 			boolean roughy = (Math.abs(newValues[0]) >= STRONG_IMPACT || Math.abs(newValues[1]) >= STRONG_IMPACT || Math.abs(newValues[2]) >= STRONG_IMPACT);
 			roughValues.add(new RoughValues(roughy, timestamp, event.values));
+			
 			if (roughy) {
+				bluetooth.writeReallyRough(timestamp);
 				this.run();
 			}
 		} else {
@@ -158,7 +169,8 @@ public class LinearSensorListener implements SensorEventListener, Runnable {
 	 */
 	@Override
 	public void run() {
-		if (roughValues.size() > 0) {
+		if (roughValues.size() > 2) {
+			bluetooth.writeRough(new Date().getTime());
 			HashMap<String, String> data = new HashMap<String, String>();
 			for (int i = 0; i < roughValues.size(); i++) {
 				roughValues.get(i).addToPostData("rough_movs", data, i);
@@ -167,6 +179,10 @@ public class LinearSensorListener implements SensorEventListener, Runnable {
 			PostRequestAsync post = new PostRequestAsync(data, imageView);
 			post.execute(URL);	
 		}
+		roughValues.clear();
+		
+			
+		
 	}
 
 }

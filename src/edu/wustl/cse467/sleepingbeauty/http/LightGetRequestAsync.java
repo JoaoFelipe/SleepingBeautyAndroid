@@ -1,5 +1,5 @@
 /*		LightGetRequestAsync.java
- * Purpose: Midterm Demo
+ * Purpose: Midterm Demo/Final Demo
  * Author : Joao Felipe
  * 		  joaofelipenp@gmail.com
  * CSE 467S - Embedded Computing Systems
@@ -8,6 +8,9 @@
  * 
  * Description:
  * 	This class realizes an asynchronous get to the light URL to check its status
+  * Version log:
+ *	  4/30/2013, Joao Felipe
+ *    	Refactoring LightInformation to possibility change from web and from bluetooth
  */
 
 package edu.wustl.cse467.sleepingbeauty.http;
@@ -16,11 +19,11 @@ package edu.wustl.cse467.sleepingbeauty.http;
 import java.util.HashMap;
 
 import edu.wustl.cse467.sleepingbeauty.R;
+import edu.wustl.cse467.sleepingbeauty.gui.LightInformation;
 import edu.wustl.cse467.sleepingbeauty.gui.LightStatus;
 
 import android.os.AsyncTask;
 import android.widget.ImageView;
-import android.widget.ToggleButton;
 
 public class LightGetRequestAsync extends AsyncTask<String, String, String> {
 
@@ -28,16 +31,16 @@ public class LightGetRequestAsync extends AsyncTask<String, String, String> {
 	
 	private GetRequest getRequest;
 	private ImageView imageView;
-	private ToggleButton toggleButton;
+	private LightInformation lightInformation;
 	
 	
 	/* Class constructor
 	 * 	Receives the image of internet status and the light button
 	 */
-	public LightGetRequestAsync(ImageView imageView, ToggleButton toggleButton) {
+	public LightGetRequestAsync(ImageView imageView, LightInformation lightInformation) {
 		getRequest = new GetRequest(new HashMap<String, String>());
 		this.imageView = imageView;
-		this.toggleButton = toggleButton;
+		this.lightInformation = lightInformation;
 	}
 	
 	/*
@@ -57,11 +60,12 @@ public class LightGetRequestAsync extends AsyncTask<String, String, String> {
 		if (getRequest.status == 200 || getRequest.status == 406) {
 			imageView.setImageResource(R.drawable.green);
 			if (!LightStatus.buttonClicked) {
-				if (r.equals("0")) {
-					toggleButton.setChecked(false);
-				} else {
-					toggleButton.setChecked(true);
+				String[] parts = r.split(",");
+				if (parts.length < 2) {
+					System.out.println("Ops: " + r);
+					return;
 				}
+				lightInformation.setLight(Long.parseLong(parts[1]), parts[0].equals("1"));
 			}
 		} else {
 			imageView.setImageResource(R.drawable.red);

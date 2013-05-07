@@ -19,3 +19,8 @@ Dependencies:
 Running:
   * Use the android sdk to compile with an android device plugged. 
   * Or build the project, save the .apk on the android and install
+
+Collaborators:
+- Tiago Pimentel Martins da Silva - t.pimentelms@gmail.com
+- Joao Felipe Nicolaci Pimentel  - joaofelipenp@gmail.comy
+- Matheus Fernandes de Camargo	- matheusfc09@gmail.com
